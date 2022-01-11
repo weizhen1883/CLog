@@ -1,12 +1,10 @@
 #ifdef TEST
 
 #include <stdio.h>
+#include <string.h>
 #include "unity.h"
 
 #include "clog.h"
-
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
 
 char log_buf[255];
 
@@ -18,11 +16,7 @@ static void clog_print (clog_level_t level, char * str)
 
 static void clear_log_buf (void)
 {
-    uint16_t i;
-    for (i = 0; i < 255; i++)
-    {
-        log_buf[i] = 0;
-    }
+    memset(log_buf, 0, sizeof(log_buf));
 }
 
 void setUp(void)
