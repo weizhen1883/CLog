@@ -1,8 +1,36 @@
+/////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2022, Zhen Wei                                                //
+//                                                                             //
+// Permission is hereby granted, free of charge, to any person obtaining a     //
+// copy of this software and associated documentation files (the "Software"),  //
+// to deal in the Software without restriction, including without limitation   //
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,    //
+// and/or sell copies of the Software, and to permit persons to whom the       //
+// Software is furnished to do so, subject to the following conditions:        //
+//                                                                             //
+// The above copyright notice and this permission notice shall be included     //
+// in all copies or substantial portions of the Software.                      //
+//                                                                             //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS     //
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, //
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL     //
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  //
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING     //
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER D       //
+// EALINGS IN THE SOFTWARE.                                                    //
+/////////////////////////////////////////////////////////////////////////////////
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "clog.h"
+
+#define CLOG_VERSION_MAJOR      1
+#define CLOG_VERSION_MINOR      0
+#define CLOG_VERSION_BUILD      0
+
+#define CLOG_VERSION_STR(X)     ('0' + X)
 
 #ifndef CLOG_MAX_BUF_SIZE
 #define CLOG_MAX_BUF_SIZE   255
@@ -38,9 +66,19 @@ static void clog_get_ansi_color_str (char * color_str,
                                      clog_color_type_t type,
                                      clog_color_code_t color_code);
 
-clog_t clog_cfg = { .level = CLOG_DEFAULT_LOG_LEVEL,
-                    .color_enable = COLOR_OFF,
-                    .print = clog_default_print };
+static clog_version_t clog_version = { .major = CLOG_VERSION_MAJOR,
+                                       .minor = CLOG_VERSION_MINOR,
+                                       .build = CLOG_VERSION_BUILD, };
+
+static const uint8_t version_str_size = 6;
+static char clog_version_str[version_str_size] = {
+                CLOG_VERSION_STR(CLOG_VERSION_MAJOR), '.',
+                CLOG_VERSION_STR(CLOG_VERSION_MINOR), '.',
+                CLOG_VERSION_STR(CLOG_VERSION_BUILD), '\0' };
+
+static clog_t clog_cfg = { .level = CLOG_DEFAULT_LOG_LEVEL,
+                           .color_enable = COLOR_OFF,
+                           .print = clog_default_print, };
 
 void clog_set_level (clog_level_t level)
 {
@@ -100,6 +138,16 @@ void clog_logging (clog_level_t level, const char * format, ...)
 
         clog_output(level, &buf[0]);
     }
+}
+
+clog_version_t clog_get_version (void)
+{
+     return clog_version;
+}
+
+char * clog_get_version_str (void)
+{
+    return &clog_version_str[0];
 }
 
 static void clog_default_print (clog_level_t level, char * str)
