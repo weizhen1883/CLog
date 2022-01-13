@@ -27,7 +27,7 @@
 #include "clog.h"
 
 #define CLOG_VERSION_MAJOR      1
-#define CLOG_VERSION_MINOR      0
+#define CLOG_VERSION_MINOR      1
 #define CLOG_VERSION_BUILD      0
 
 #define CLOG_VERSION_STR(X)     ('0' + X)

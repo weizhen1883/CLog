@@ -147,11 +147,16 @@ void ms_timer_handler(void)
     clog_timestamp_tick_update();
 }
 ```
-then the timestamp is in ms. 
+then the timestamp is in ms.
 
 ### Release History
 
 ### Version History
+
+#### Version 1.1.0
+- Add timestamp feature
+- Add logging output with timestamp and log leve
+
 #### Version 1.0.0
 - Add basic log4j log feature with 8 levels
 - Add colored log feature based on ANSI escape sequences
