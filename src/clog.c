@@ -63,10 +63,10 @@ typedef struct
 
 static void clog_default_print (clog_level_t level, char * str);
 static void clog_output (clog_level_t level, char * str);
+static void clog_output_add_color (clog_level_t level, char * str);
 static void clog_get_ansi_color_str (char * color_str,
                                      clog_color_type_t type,
                                      clog_color_code_t color_code);
-static void clog_print_mode_switch (clog_level_t level, char * str);
 
 static clog_version_t clog_version = { .major = CLOG_VERSION_MAJOR,
                                        .minor = CLOG_VERSION_MINOR,
@@ -183,7 +183,48 @@ static void clog_get_ansi_color_str (char * color_str,
     sprintf(color_str, "\x1b[%d;5;%dm", type, color_code);
 }
 
+static char log_msg_buf[CLOG_MAX_BUF_SIZE];
+static uint16_t log_msg_ptr = 0;
 static void clog_output (clog_level_t level, char * str)
+{
+    switch (clog_cfg.mode)
+    {
+        case MODE_W_LOG_INFO:
+        {
+            uint16_t i;
+            for (i = 0; i < CLOG_MAX_BUF_SIZE && str[i] != '\0'; i++)
+            {
+                if (0 == log_msg_ptr)
+                {
+                    const uint8_t buf_size = 15;
+                    char buf[buf_size];
+                    sprintf(buf, "(%d)[%d]", clog_timestamp, level);
+
+                    uint8_t j;
+                    for (j = 0; j < buf_size && buf[j] != '\0'; j++)
+                    {
+                        log_msg_buf[log_msg_ptr++] = buf[j];
+                    }
+                }
+
+                log_msg_buf[log_msg_ptr++] = str[i];
+                if (str[i] == '\n')
+                {
+                    log_msg_buf[log_msg_ptr++] = '\0';
+                    clog_output_add_color(level, &log_msg_buf[0]);
+                    log_msg_ptr = 0;
+                }
+            }
+            break;
+        }
+        case MODE_MSG_ONLY:
+        default:
+            clog_output_add_color(level, &str[0]);
+            break;
+    }
+}
+
+static void clog_output_add_color (clog_level_t level, char * str)
 {
     if (COLOR_ON == clog_cfg.color_enable &&
         COLOR_TYPE_NONE != clog_cfg.color[level].type)
@@ -208,29 +249,11 @@ static void clog_output (clog_level_t level, char * str)
             clog_cfg.print(level, &color_str[0]);
         }
 
-        clog_print_mode_switch(level, &str[0]);
+        clog_cfg.print(level, &str[0]);
         clog_cfg.print(level, ANSI_COLOR_RESET);
     }
     else
     {
-        clog_print_mode_switch(level, &str[0]);
-    }
-}
-
-static void clog_print_mode_switch (clog_level_t level, char * str)
-{
-    switch (clog_cfg.mode)
-    {
-        case MODE_W_LOG_INFO:
-        {
-            char buf[CLOG_MAX_BUF_SIZE];
-            sprintf(buf, "(%d)[%d]%s", clog_timestamp, level, &str[0]);
-            clog_cfg.print(level, &buf[0]);
-            break;
-        }
-        case MODE_MSG_ONLY:
-        default:
-            clog_cfg.print(level, &str[0]);
-            break;
+        clog_cfg.print(level, &str[0]);
     }
 }
