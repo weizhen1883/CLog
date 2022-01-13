@@ -58,6 +58,7 @@ typedef struct
     clog_color_en_t color_enable;
     clog_color_t color[CLOG_LOG_LEVEL_SIZE];
     clog_print_t print;
+    clog_mode_t mode;
 } clog_t;
 
 static void clog_default_print (clog_level_t level, char * str);
@@ -65,6 +66,7 @@ static void clog_output (clog_level_t level, char * str);
 static void clog_get_ansi_color_str (char * color_str,
                                      clog_color_type_t type,
                                      clog_color_code_t color_code);
+static void clog_print_mode_switch (clog_level_t level, char * str);
 
 static clog_version_t clog_version = { .major = CLOG_VERSION_MAJOR,
                                        .minor = CLOG_VERSION_MINOR,
@@ -78,7 +80,10 @@ static char clog_version_str[version_str_size] = {
 
 static clog_t clog_cfg = { .level = CLOG_DEFAULT_LOG_LEVEL,
                            .color_enable = COLOR_OFF,
-                           .print = clog_default_print, };
+                           .print = clog_default_print,
+                           .mode = MODE_MSG_ONLY, };
+
+static volatile clog_timestamp_t clog_timestamp = 0;
 
 void clog_set_level (clog_level_t level)
 {
@@ -150,6 +155,21 @@ char * clog_get_version_str (void)
     return &clog_version_str[0];
 }
 
+void clog_timestamp_tick_update (void)
+{
+    clog_timestamp++;
+}
+
+void clog_timestamp_reset (void)
+{
+    clog_timestamp = 0;
+}
+
+void clog_mode_set (clog_mode_t mode)
+{
+    clog_cfg.mode = mode;
+}
+
 static void clog_default_print (clog_level_t level, char * str)
 {
     (void)level;
@@ -188,11 +208,29 @@ static void clog_output (clog_level_t level, char * str)
             clog_cfg.print(level, &color_str[0]);
         }
 
-        clog_cfg.print(level, &str[0]);
+        clog_print_mode_switch(level, &str[0]);
         clog_cfg.print(level, ANSI_COLOR_RESET);
     }
     else
     {
-        clog_cfg.print(level, &str[0]);
+        clog_print_mode_switch(level, &str[0]);
+    }
+}
+
+static void clog_print_mode_switch (clog_level_t level, char * str)
+{
+    switch (clog_cfg.mode)
+    {
+        case MODE_W_LOG_INFO:
+        {
+            char buf[CLOG_MAX_BUF_SIZE];
+            sprintf(buf, "(%d)[%d]%s", clog_timestamp, level, &str[0]);
+            clog_cfg.print(level, &buf[0]);
+            break;
+        }
+        case MODE_MSG_ONLY:
+        default:
+            clog_cfg.print(level, &str[0]);
+            break;
     }
 }

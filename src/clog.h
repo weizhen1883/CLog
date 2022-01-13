@@ -56,6 +56,12 @@ enum
     BOTH            = 255,
 };
 
+enum
+{
+    MODE_MSG_ONLY = 0,
+    MODE_W_LOG_INFO,
+};
+
 typedef struct
 {
     uint8_t major;
@@ -67,6 +73,8 @@ typedef uint8_t clog_level_t;
 typedef uint8_t clog_color_en_t;
 typedef uint8_t clog_color_type_t;
 typedef uint8_t clog_color_code_t;
+typedef uint32_t clog_timestamp_t;
+typedef uint8_t clog_mode_t;
 typedef void (*clog_print_t) (clog_level_t level, char * str);
 
 void clog_set_level (clog_level_t level);
@@ -80,6 +88,11 @@ void clog_logging (clog_level_t level, const char * format, ...);
 
 clog_version_t clog_get_version (void);
 char *  clog_get_version_str (void);
+
+void clog_timestamp_tick_update (void);
+void clog_timestamp_reset (void);
+
+void clog_mode_set (clog_mode_t mode);
 
 #ifdef __cplusplus
 extern }

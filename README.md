@@ -131,6 +131,24 @@ The type can color can be changed by three functions
 - `clog_set_background(level, color)` is used to only set a color for a level as BACKGROUND type
 - `clog_set_color(level, type, forecolor, background)` is used to set type and color by user given. it can also do the feature `clog_set_forecolor` and `clog_set_background` given.
 
+#### Log with Timestamp and Level Info
+This library also support logging with timestamp and level info in format `(timestamp)[level]message`. This feature is not set as default mode, to using this feature require to set the mdoe to `MODE_W_LOG_INFO` by call `clog_mode_set(MODE_W_LOG_INFO)`.
+
+There are two mode support in this librar
+| Mode | Decription |
+| :-: | :-: |
+| MODE_MSG_ONLY (Default) | Only print out the logging message |
+| MODE_W_LOG_INFO | Print out the logging message with timestamp and log level |
+
+To make the timestamp work, require to update the timestamp by calling `clog_timestamp_tick_update()`. For example
+```
+void ms_timer_handler(void)
+{
+    clog_timestamp_tick_update();
+}
+```
+then the timestamp is in ms. 
+
 ### Release History
 
 ### Version History
