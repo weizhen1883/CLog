@@ -28,7 +28,7 @@
 
 #define CLOG_VERSION_MAJOR      1
 #define CLOG_VERSION_MINOR      1
-#define CLOG_VERSION_BUILD      1
+#define CLOG_VERSION_BUILD      2
 
 #define CLOG_VERSION_STR(X)     ('0' + X)
 
@@ -137,7 +137,7 @@ void clog_logging (clog_level_t level, const char * format, ...)
     {
         char buf[CLOG_MAX_BUF_SIZE];
         memset(buf, 0, sizeof(buf));
-        
+
         va_list vl;
         va_start(vl, format);
         vsprintf(&buf[0], format, vl);

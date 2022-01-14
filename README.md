@@ -154,6 +154,9 @@ then the timestamp is in ms.
 ### Version History
 
 #### Version 1.1.1
+- fix colored log buf issue
+
+#### Version 1.1.1
 - fix the bug at log with timestamp and level
 
 #### Version 1.1.0
