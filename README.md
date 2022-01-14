@@ -151,9 +151,16 @@ then the timestamp is in ms.
 
 ### Release History
 
+#### Release 1
+- Version 1.1.2
+- Features
+    - support 8 different log levels followed by log4j standard
+    - support colored log
+    - support log info mode which print out timestamp and log level
+
 ### Version History
 
-#### Version 1.1.1
+#### Version 1.1.2
 - fix colored log buf issue
 
 #### Version 1.1.1
