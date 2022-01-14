@@ -136,6 +136,8 @@ void clog_logging (clog_level_t level, const char * format, ...)
     if (level <= clog_cfg.level)
     {
         char buf[CLOG_MAX_BUF_SIZE];
+        memset(buf, 0, sizeof(buf));
+        
         va_list vl;
         va_start(vl, format);
         vsprintf(&buf[0], format, vl);
@@ -198,6 +200,7 @@ static void clog_output (clog_level_t level, char * str)
                 {
                     const uint8_t buf_size = 15;
                     char buf[buf_size];
+                    memset(buf, 0, sizeof(buf));
                     sprintf(buf, "(%d)[%d]", clog_timestamp, level);
 
                     uint8_t j;
@@ -213,6 +216,7 @@ static void clog_output (clog_level_t level, char * str)
                     log_msg_buf[log_msg_ptr++] = '\0';
                     clog_output_add_color(level, &log_msg_buf[0]);
                     log_msg_ptr = 0;
+                    memset(log_msg_buf, 0, sizeof(log_msg_buf));
                 }
             }
             break;
@@ -229,15 +233,26 @@ static void clog_output_add_color (clog_level_t level, char * str)
     if (COLOR_ON == clog_cfg.color_enable &&
         COLOR_TYPE_NONE != clog_cfg.color[level].type)
     {
-
+        uint8_t is_new_line = 0;
+        uint16_t i = 0;
+        uint16_t buf_ptr = 0;
+        char buf[CLOG_MAX_BUF_SIZE];
         char color_str[CLOG_MAX_COLOR_STR_SIZE];
+
+        memset(buf, 0, sizeof(buf));
+        memset(color_str, 0, sizeof(color_str));
+
         if (FORECOLOR == clog_cfg.color[level].type ||
             BOTH == clog_cfg.color[level].type)
         {
             clog_get_ansi_color_str(&color_str[0],
                                     FORECOLOR,
                                     clog_cfg.color[level].forecolor);
-            clog_cfg.print(level, &color_str[0]);
+
+            for (i = 0; i < CLOG_MAX_COLOR_STR_SIZE && color_str[i] != '\0'; i++)
+            {
+                buf[buf_ptr++] = color_str[i];
+            }
         }
         memset(color_str, 0, sizeof(color_str));
         if (BACKGROUND == clog_cfg.color[level].type ||
@@ -246,11 +261,43 @@ static void clog_output_add_color (clog_level_t level, char * str)
             clog_get_ansi_color_str(&color_str[0],
                                     BACKGROUND,
                                     clog_cfg.color[level].background);
-            clog_cfg.print(level, &color_str[0]);
+            for (i = 0; i < CLOG_MAX_COLOR_STR_SIZE && color_str[i] != '\0'; i++)
+            {
+                buf[buf_ptr++] = color_str[i];
+            }
         }
 
-        clog_cfg.print(level, &str[0]);
-        clog_cfg.print(level, ANSI_COLOR_RESET);
+        for (i = 0; i < CLOG_MAX_BUF_SIZE && str[i] != '\0'; i++)
+        {
+            buf[buf_ptr++] = str[i];
+        }
+
+        // ignore the new line, if there is new line there
+        if (buf[buf_ptr - 1] == '\n')
+        {
+            buf_ptr -= 1;
+
+            if (buf[buf_ptr - 1] == '\r')
+            {
+                buf_ptr -= 1;
+            }
+
+            is_new_line = 1;
+        }
+
+        memcpy(color_str, ANSI_COLOR_RESET, sizeof(ANSI_COLOR_RESET));
+        for (i = 0; i < CLOG_MAX_COLOR_STR_SIZE && color_str[i] != '\0'; i++)
+        {
+            buf[buf_ptr++] = color_str[i];
+        }
+
+        if (is_new_line == 1)
+        {
+            buf[buf_ptr++] = '\r';
+            buf[buf_ptr++] = '\n';
+        }
+
+        clog_cfg.print(level, &buf[0]);
     }
     else
     {

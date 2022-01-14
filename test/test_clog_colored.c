@@ -65,27 +65,27 @@ void test_clog_colored_default(void)
     clog_set_level(ALL);
 
     clog_logging(FATAL, "logging in level fatal\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;1mlogging in level fatal\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;1mlogging in level fatal\x1B[0m\r\n");
     clear_log_buf();
 
     clog_logging(ERROR, "logging in level error\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;2mlogging in level error\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;2mlogging in level error\x1B[0m\r\n");
     clear_log_buf();
 
     clog_logging(WARN, "logging in level warn\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;3mlogging in level warn\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;3mlogging in level warn\x1B[0m\r\n");
     clear_log_buf();
 
     clog_logging(INFO, "logging in level info\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;4mlogging in level info\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;4mlogging in level info\x1B[0m\r\n");
     clear_log_buf();
 
     clog_logging(DEBUG, "logging in level debug\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;5mlogging in level debug\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;5mlogging in level debug\x1B[0m\r\n");
     clear_log_buf();
 
     clog_logging(TRACE, "logging in level trace\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;6mlogging in level trace\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;6mlogging in level trace\x1B[0m\r\n");
     clear_log_buf();
 }
 
@@ -96,7 +96,7 @@ void test_clog_set_forecolor(void)
     clog_set_forecolor(INFO, 11);
 
     clog_logging(INFO, "logging in level info\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;11mlogging in level info\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;11mlogging in level info\x1B[0m\r\n");
     clear_log_buf();
 }
 
@@ -107,7 +107,7 @@ void test_clog_set_background(void)
     clog_set_background(INFO, 11);
 
     clog_logging(INFO, "logging in level info\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[48;5;11mlogging in level info\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[48;5;11mlogging in level info\x1B[0m\r\n");
     clear_log_buf();
 }
 
@@ -118,7 +118,7 @@ void test_clog_set_color(void)
     clog_set_color(INFO, BOTH, 10, 11);
 
     clog_logging(INFO, "logging in level info\r\n");
-    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;10m\x1b[48;5;11mlogging in level info\r\n\x1B[0m");
+    TEST_ASSERT_EQUAL_STRING(log_buf, "\x1b[38;5;10m\x1b[48;5;11mlogging in level info\x1B[0m\r\n");
     clear_log_buf();
 }
 
